@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from config import token  # Token'ı config dosyasından çekiyoruz
 
 
 from logic import Pokemon
