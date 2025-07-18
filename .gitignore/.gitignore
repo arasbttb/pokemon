@@ -1,0 +1,4 @@
+logic.py
+.env
+__pycache__/
+.vscode/
