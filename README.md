@@ -43,3 +43,5 @@ Bu proje tamamen öğrenme ve eğlenme amacıyla geliştirilmiştir. Katkıda bu
 
 ## 🕹️Nasıl Yardım alacağım?⚡
 !info komudunu kullan ve config.py dosyasına tokenini koy ve herşey hazır.⚡
+<img width="498" height="530" alt="image" src="https://github.com/user-attachments/assets/a4bb70a7-497a-4c8c-94f2-10c3a0ccdab8" />
+
