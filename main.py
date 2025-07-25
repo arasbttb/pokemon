@@ -12,7 +12,7 @@ intents.message_content = True       # Botun mesaj içeriğini okumasına izin v
 intents.guilds = True                # Botun sunucularla çalışmasına izin verme
 
 # Tanımlanmış bir komut önekine ve etkinleştirilmiş amaçlara sahip bir bot oluşturma
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
 
 
@@ -30,7 +30,7 @@ from logic import Pokemon  # Pokemon sınıfını dışarıdan çekiyoruz
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
+
 
 @bot.event
 async def on_ready():
@@ -55,15 +55,20 @@ async def go(ctx):
     else:
         await ctx.send("Zaten kendi Pokémonunuzu oluşturdunuz!")
 @bot.command()
+@bot.command(name="help")
 async def help(ctx):
-    help_text = (
-        "**!go**: Kendi Pokémon'unuzu oluşturun.\n"
-        "**!sil**: Pokémon'unuzu silin.\n"
-        "**!info**: Pokémon'unuzun bilgilerini gösterin.\n"
-        "**!attack @kullanıcı**: Belirtilen kullanıcıya saldırın.\n"
-        "**!feed**: Pokémon'unuzu besleyin."
+    embed = discord.Embed(
+        title="📘 Yardım Komutu",
+        description="Bot komutlarının açıklamaları:",
+        color=discord.Color.blue()
     )
-    await ctx.send(help_text)
+    embed.add_field(name="!go", value="Bir Pokémon oluştur.", inline=False)
+    embed.add_field(name="!feed", value="Pokémonunu besle.", inline=False)
+    embed.add_field(name="!attack @kullanıcı", value="Bir Pokémon'a saldır.", inline=False)
+    embed.add_field(name="!info", value="Pokémon bilgini göster.", inline=False)
+    embed.add_field(name="!sil", value="Pokémonunu sil.", inline=False)
+    
+    await ctx.send(embed=embed)
 @bot.command()
 async def sil(ctx):
     author = ctx.author.name
