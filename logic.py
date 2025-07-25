@@ -1,5 +1,9 @@
+import datetime
 import aiohttp
 import random
+from datetime import datetime, timedelta
+
+from config import token  # Token'ı config dosyasından çekiyoruz --- IGNORE ---
 def rastgele_baslangic(min=30, max=60):
     return random.randint(min, max)
 def rastgele_saglik(min=1000, max=4000):
@@ -12,9 +16,11 @@ class Pokemon:
     pokemons = {}
 
     def __init__(self, pokemon_trainer):
+
+        self.last_feed_time = datetime.now() - timedelta(seconds=1000)
         self.feed_count = 0       # 🔧 Besleme sayacı eklendi
         self.level = 1            # 🔧 Seviye takip sistemi eklendi
-        self.power = rastgele_baslangic(30,60)  # ✅ Güç değeri rastgele atanıyor
+        self.power = random.randint(30,60) # ✅ Güç değeri rastgele atanıyor
         self.hp = rastgele_saglik(1000, 4000)  # ✅ Sağlık değeri rastgele atanıyor
 
         self.pokemon_trainer = pokemon_trainer
@@ -68,11 +74,24 @@ class Pokemon:
         else:
             enemy.hp = 0
             return f"Pokémon eğitmeni @{self.pokemon_trainer} @{enemy.pokemon_trainer}'ni yendi!"
+    async def feed(self, feed_interval=20, hp_increase=10):
+        current_time = datetime.now()
+        delta_time = timedelta(seconds=feed_interval)
+        if (current_time - self.last_feed_time) > delta_time:
+            self.hp += hp_increase
+            self.last_feed_time = current_time
+            self.feed_count += 1  # Besleme sayısı artmalı!
+            return f"{self.name} beslendi! Yeni sağlık: {self.hp}"
+        else:
+            kalan_saniye = int((self.last_feed_time + delta_time - current_time).total_seconds())
+            return f"{self.name} şu kadar saniye sonra tekrar beslenebilir: {kalan_saniye}s"
 
 
 
 class Wizard(Pokemon):
-    pass
+    def feed(self):
+        super().feed(hp_increase=25)  # Sihirbaz daha az beslenmeli!
+
 
 
 
@@ -81,13 +100,15 @@ class Fighter(Pokemon):
     async def attack(self, enemy):
         if rastgele_guc(5,15) > 9:  # ✅ Süper saldırı şansına göre mesaj verilir ama gerçek saldırı yapılmaz!
             return "Dövüşçü Pokémon, savaşta süper saldırı kullandı!"
-
+        
         super_power = rastgele_guc(10,15)  # ✅ Güç artırımı burada tanımlandı (önceden globaldi — hata çıkarırdı)
         self.power += super_power  # ✅ Saldırı öncesi güce ekleniyor
         sonuc = await super().attack(enemy)  # ✅ Normal saldırı uygulanıyor
         self.power -= super_power  # ✅ Güç değeri eski haline getiriliyor
-        return sonuc + f"\nDövüşçü Pokémon süper saldırı kullandı. Eklenen güç: {super_guc}"
-        # ✅ Saldırı sonrası bilgi mesajı ekleniyor. Artırılan güç doğru şekilde gösteriliyor.
+        return sonuc + f"\nDövüşçü Pokémon süper saldırı kullandı. Eklenen güç: {self.power + super_power} (önceki güç: {self.power})"  # ✅ Saldırı sonrası bilgi mesajı ekleniyor. Artırılan güç doğru şekilde gösteriliyor.
+
+    def feed(self):
+        super().feed(feed_interval=5)  # Dövüşçü daha sık beslenebilir!
 if __name__ == '__main__':
     wizard = Wizard("username1")
     fighter = Fighter("username2")

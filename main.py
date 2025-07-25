@@ -1,9 +1,10 @@
+import datetime
 import discord
 from discord.ext import commands
 
-
+from config import token  # token.py dosyasından botun token'ını içe aktarıyoruz
 from logic import Pokemon
-
+import time
 # Bot için yetkileri/intents ayarlama
 intents = discord.Intents.default()  # Varsayılan ayarların alınması
 intents.messages = True              # Botun mesajları işlemesine izin verme
@@ -55,23 +56,37 @@ async def go(ctx):
         await ctx.send("Zaten kendi Pokémonunuzu oluşturdunuz!")
 
 @bot.command()
-async def besle(ctx):
+async def sil(ctx):
+    author = ctx.author.name
+    if author in Pokemon.pokemons:
+        del Pokemon.pokemons[author]
+        await ctx.send(f"{author} adlı Pokémon silindi. 😢")
+    else:
+        await ctx.send("Silinecek bir Pokémon bulunamadı. Önce '!go' ile oluşturmalısınız.")
+
+
+@bot.command()
+async def feed(ctx):
     author = ctx.author.name
     if author in Pokemon.pokemons:
         pokemon = Pokemon.pokemons[author]
-        pokemon.feed_count += 1
-        if pokemon.feed_count % 10 == 0:
-            pokemon.level += 1
-            await ctx.send(f"Tebrikler! {author} adlı Pokémon'un seviyesi {pokemon.level} oldu!")
-        else:
-            await ctx.send(f"{author} adlı Pokémon {pokemon.feed_count} kez beslendi.")
+        response = await pokemon.feed()  # feed fonksiyonu çağrılıyor
+        await ctx.send(response)         # gelen mesaj Discord'da gösteriliyor
     else:
         await ctx.send("Önce bir Pokémon oluşturmalısınız! '!go' komutunu kullanın.")
 
 
 
 
-
+async def feed(self, feed_interval=20, hp_increase=10):
+    current_time = datetime.now()
+    delta_time = datetime.timedelta(seconds=feed_interval)
+    if (current_time - self.last_feed_time) > delta_time:
+        self.hp += hp_increase
+        self.last_feed_time = current_time
+        return f"Pokémon'un sağlığı geri yüklenir. Mevcut sağlık: {self.hp}"
+    else:
+        return f"Pokémonunuzu şu zaman besleyebilirsiniz: {current_time+delta_time}"
 
 
 @bot.command()
