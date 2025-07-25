@@ -54,7 +54,16 @@ async def go(ctx):
             await ctx.send("Pokémonun görüntüsü yüklenemedi!")
     else:
         await ctx.send("Zaten kendi Pokémonunuzu oluşturdunuz!")
-
+@bot.command()
+async def help(ctx):
+    help_text = (
+        "**!go**: Kendi Pokémon'unuzu oluşturun.\n"
+        "**!sil**: Pokémon'unuzu silin.\n"
+        "**!info**: Pokémon'unuzun bilgilerini gösterin.\n"
+        "**!attack @kullanıcı**: Belirtilen kullanıcıya saldırın.\n"
+        "**!feed**: Pokémon'unuzu besleyin."
+    )
+    await ctx.send(help_text)
 @bot.command()
 async def sil(ctx):
     author = ctx.author.name
